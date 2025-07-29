@@ -1,0 +1,16 @@
+---
+- name: Deploy Dockerized Java App
+  hosts: deploy
+  become: true
+  tasks:
+    - name: Stop running container if exists
+      shell: |
+        docker ps -q --filter "name=java-app" | grep -q . && docker stop java-app || true
+    - name: Remove container if exists
+      shell: |
+        docker ps -a -q --filter "name=java-app" | grep -q . && docker rm java-app || true
+    - name: Pull latest Docker image from Docker Hub
+      shell: docker pull thekirang/java-ci-demo:latest
+    - name: Run container with port mapping
+      shell: |
+        docker run -d --name java-app -p 80:8080 thekirang/java-ci-demo:latest
